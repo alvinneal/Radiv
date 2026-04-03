@@ -1,4 +1,4 @@
-# Bullshark
+# BullShark
 
 **Built to Detect. Designed to Strike.**
 
