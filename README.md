@@ -1,6 +1,6 @@
-# Radiv
+# Bullshark
 
-**Your Radar for Derivatives**
+**Built to Detect. Designed to Strike.**
 
 A Nifty 50 options signal engine that generates BUY/SELL recommendations using technical indicators. Built from the ground up as a learning project.
 
