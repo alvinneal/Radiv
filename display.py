@@ -7,8 +7,6 @@ Clean terminal output. All printing lives here.
 import pandas as pd
 
 
-# ─── ANSI COLORS ─────────────────────────────────────────────────────────────
-
 class C:
     RESET  = "\033[0m"
     BOLD   = "\033[1m"
@@ -29,22 +27,15 @@ SIGNAL_STYLE = {
 }
 
 
-# ─── HEADER ──────────────────────────────────────────────────────────────────
-
-def header(indicators: str = "EMA"):
+def header(ema_fast: int = 9, ema_slow: int = 21, interval: str = "1d", period: str = "1y"):
+    settings = f"EMA {ema_fast}/{ema_slow}  ·  {interval} candles  ·  {period}"
     print(f"""
-{C.CYAN}{C.BOLD}  ┌──────────────────────────────────────────────┐
-  │              R A D I V                       │
-  │        Your Radar for Derivatives            │
-  ├──────────────────────────────────────────────┤
-  │  Nifty 50  ·  {indicators:<30s}│
-  └──────────────────────────────────────────────┘{C.RESET}
+{C.CYAN}{C.BOLD}  R A D I V{C.RESET}  {C.DIM}Your Radar for Derivatives{C.RESET}
+  {C.DIM}Nifty 50  ·  {settings}{C.RESET}
 """)
 
 
-# ─── LATEST SIGNAL ───────────────────────────────────────────────────────────
-
-def latest(df: pd.DataFrame):
+def latest(df: pd.DataFrame, ema_fast: int = 9, ema_slow: int = 21):
     row = df.iloc[-1]
     prev = df.iloc[-2]
     change_pct = (row["close"] / prev["close"] - 1) * 100
@@ -56,8 +47,8 @@ def latest(df: pd.DataFrame):
     print(f"  {C.BOLD}LATEST{C.RESET}  {C.DIM}{date_str}{C.RESET}")
     print(f"  {'─' * 46}")
     print(f"  Close        {C.BOLD}₹{row['close']:>10,.2f}{C.RESET}  ({change_pct:+.2f}%)")
-    print(f"  EMA 9        ₹{row['ema_fast']:>10,.2f}")
-    print(f"  EMA 21       ₹{row['ema_slow']:>10,.2f}   gap: {gap_pct:+.2f}%")
+    print(f"  EMA {ema_fast:<8d} ₹{row['ema_fast']:>10,.2f}")
+    print(f"  EMA {ema_slow:<8d} ₹{row['ema_slow']:>10,.2f}   gap: {gap_pct:+.2f}%")
 
     if row["bullish_cross"]:
         print(f"               {C.GREEN}★ Bullish crossover today{C.RESET}")
@@ -70,11 +61,9 @@ def latest(df: pd.DataFrame):
     print()
 
 
-# ─── RECENT TABLE ────────────────────────────────────────────────────────────
-
-def recent(df: pd.DataFrame, n: int = 15):
+def recent(df: pd.DataFrame, n: int = 10):
     tail = df.tail(n)
-    print(f"  {C.BOLD}RECENT{C.RESET}  (last {n} days)")
+    print(f"  {C.BOLD}RECENT{C.RESET}  (last {n} bars)")
     print(f"  {'─' * 46}")
     print(f"  {C.DIM}{'Date':<12s} {'Close':>10s} {'EMA gap':>8s}  Signal{C.RESET}")
 
@@ -89,8 +78,6 @@ def recent(df: pd.DataFrame, n: int = 15):
         )
     print()
 
-
-# ─── STATS ───────────────────────────────────────────────────────────────────
 
 def stats(df: pd.DataFrame):
     valid = df[df["signal"] != "WAIT"]
@@ -108,8 +95,6 @@ def stats(df: pd.DataFrame):
         print(f"  {style}{sig:<12s}{C.RESET}  {c:>4d}  ({pct:>5.1f}%)  {C.DIM}{bar}{C.RESET}")
     print()
 
-
-# ─── DISCLAIMER ──────────────────────────────────────────────────────────────
 
 def disclaimer():
     print(f"  {C.DIM}⚠  Educational only. Not financial advice.{C.RESET}")
